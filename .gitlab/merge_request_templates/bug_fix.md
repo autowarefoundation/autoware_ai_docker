@@ -1,3 +1,4 @@
+/label ~bug
 <!--
 FOR SUPPORT REQUESTS, please ask at ROS Answers: https://answers.ros.org/questions/ask/?tags=autoware, make sure to use the "autoware" tag.
 For general discussion, please use the Autoware Discourse category: https://discourse.ros.org/c/autoware
@@ -66,6 +67,3 @@ If you include code, do not use a screenshot.
 ### Fix applied
 <!-- Describe in detail the approach taken, tools used, etc. to identify the cause of the bug and what was done to fix it. -->
 
-
-<!-- Do not change the below lines -->
-/label ~bug

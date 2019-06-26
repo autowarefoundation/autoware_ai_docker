@@ -1,3 +1,4 @@
+/label ~enhancement
 <!--
 FOR SUPPORT REQUESTS, please ask at ROS Answers: https://answers.ros.org/questions/ask/?tags=autoware, make sure to use the "autoware" tag.
 For general discussion, please use the Autoware Discourse category: https://discourse.ros.org/c/autoware
@@ -36,6 +37,3 @@ e.g. "When I am ... I want to be able to ... so that I can ..." -->
 <!-- Describe the approach taken to implement the feature.
 Provide a link to a detailed design document and discussion of that design. Implementations without design documentation will not be accepted until design documentation has been provided and discussed. Usually this is done via the feature request issue. -->
 
-
-<!-- Do not change the below lines -->
-/label ~enhancement
