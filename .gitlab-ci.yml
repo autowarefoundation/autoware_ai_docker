@@ -1,0 +1,12 @@
+dockerfile_lint:
+  stage: test
+  image: hadolint/hadolint:latest-debian
+  script:
+    - hadolint generic/Dockerfile
+    - hadolint generic/Dockerfile.base
+    - hadolint generic/Dockerfile.cuda.kinetic
+    - hadolint generic/Dockerfile.cuda.melodic
+    - hadolint crossbuild/Dockerfile.kinetic-crossbuild
+    - hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
+    - hadolint crossbuild/Dockerfile.melodic-crossbuild
+    - hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks

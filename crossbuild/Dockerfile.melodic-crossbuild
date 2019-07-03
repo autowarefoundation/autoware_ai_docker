@@ -5,14 +5,18 @@ FROM multiarch/alpine:${AUTOWARE_TARGET_ARCH}-latest-stable AS bootstrap
 FROM ${AUTOWARE_DOCKER_ARCH}/ros:melodic-perception AS sysroot
 ARG AUTOWARE_TARGET_ARCH
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 COPY --from=bootstrap /usr/bin/qemu-${AUTOWARE_TARGET_ARCH}-static /usr/bin/qemu-${AUTOWARE_TARGET_ARCH}-static
 
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     lsb-release \
     python-rosdep \
     sudo \
-    gnupg
+    gnupg && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install dependent packages used by Autoware
 COPY ./dependencies /tmp/dependencies
@@ -20,11 +24,15 @@ RUN apt-get update && \
     sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/dependencies" | xargs apt-get install -y && \
     rm -rf /var/lib/apt/lists/*
 
+# hadolint ignore=SC2156
 RUN find / -depth -xdev -type l -lname '/*' -exec sh -c 'linkpath="$(readlink {})" && rm -f {} && ln -frsv "$linkpath" "{}"' \;
 
 FROM ubuntu:18.04 AS builder
 ARG AUTOWARE_TARGET_ARCH
 ARG AUTOWARE_TARGET_PLATFORM
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ENV AUTOWARE_SYSROOT /sysroot/${AUTOWARE_TARGET_PLATFORM}
 COPY --from=sysroot /lib ${AUTOWARE_SYSROOT}/lib
 COPY --from=sysroot /usr/include ${AUTOWARE_SYSROOT}/usr/include
@@ -36,13 +44,16 @@ COPY --from=sysroot /opt ${AUTOWARE_SYSROOT}/opt
 COPY --from=sysroot /etc/alternatives ${AUTOWARE_SYSROOT}/etc/alternatives
 
 # Fix Bionic-specific issues
+# hadolint ignore=DL3008
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     tzdata \
-    gnupg
+    gnupg && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" | tee /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cython \
     crossbuild-essential-arm64 \
@@ -50,7 +61,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-rospkg \
     qt5-qmake \
     qtbase5-dev-tools \
-    ros-melodic-catkin
+    ros-melodic-catkin && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/melodic/include#${AUTOWARE_SYSROOT}/opt/ros/melodic/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/melodic/lib#${AUTOWARE_SYSROOT}/opt/ros/melodic/lib#g" {} \;
@@ -71,11 +83,14 @@ RUN sed -i -e "s#set(imported_location \"\${_qt5Core_install_prefix}/lib/qt5/bin
 RUN sed -i -e "s#define ARMA_SUPERLU_INCLUDE_DIR /usr/include/superlu/#define ARMA_SUPERLU_INCLUDE_DIR ${AUTOWARE_SYSROOT}/usr/include/superlu/#g" \
     ${AUTOWARE_SYSROOT}/usr/include/armadillo_bits/config.hpp
 
-RUN apt-get install -y python3-numpy \
+# hadolint ignore=DL3008,DL3013
+RUN apt-get install -y --no-install-recommends \
+    python3-numpy \
     python3-pip \
     python3-setuptools \
     python3-colcon-common-extensions && \
-    pip3 install -U setuptools
+    pip3 install -U setuptools && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV ROS_DISTRO melodic
 ENV CC /usr/bin/${AUTOWARE_TARGET_ARCH}-linux-gnu-gcc
@@ -83,4 +98,4 @@ ENV CXX /usr/bin/${AUTOWARE_TARGET_ARCH}-linux-gnu-g++
 ENV AR /usr/bin/${AUTOWARE_TARGET_ARCH}-linux-gnu-ar
 ENV CPP /usr/bin/${AUTOWARE_TARGET_ARCH}-linux-gnu-cpp
 
-CMD . /opt/ros/melodic/setup.sh && /bin/bash
+CMD [". /opt/ros/melodic/setup.sh && /bin/bash"]

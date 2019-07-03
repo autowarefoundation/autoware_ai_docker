@@ -1,5 +1,6 @@
 ARG FROM_ARG
 ARG ROS_DISTRO
+# hadolint ignore=DL3006
 FROM ${FROM_ARG}
 
 ENV USERNAME autoware
