@@ -1,10 +1,12 @@
 ARG FROM_ARG
+FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu16.04 as glvnd_runtime
+# hadolint ignore=DL3006
 FROM ${FROM_ARG}
-USER root
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # From nvidia cuda 9.0 base: https://gitlab.com/nvidia/cuda/tree/ubuntu16.04/9.0/base/Dockerfile
-
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates apt-transport-https gnupg-curl && \
     rm -rf /var/lib/apt/lists/* && \
     NVIDIA_GPGKEY_SUM=d1be581509378368edeec8c1eb2958702feedf3bc3d17011adbf24efacce4ab5 && \
@@ -18,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 ENV CUDA_VERSION 9.0.176
 
 ENV CUDA_PKG_VERSION 9-0=$CUDA_VERSION-1
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
         cuda-cudart-$CUDA_PKG_VERSION && \
     ln -s cuda-9.0 /usr/local/cuda && \
@@ -39,6 +42,7 @@ ENV NVIDIA_REQUIRE_CUDA "cuda>=9.0"
 
 ENV NCCL_VERSION 2.3.7
 
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
         cuda-libraries-$CUDA_PKG_VERSION \
         cuda-cublas-9-0=9.0.176.4-1 \
@@ -47,7 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         rm -rf /var/lib/apt/lists/*
 
 # From nvidia cuda 9.0 devel: https://gitlab.com/nvidia/cuda/blob/ubuntu16.04/9.0/devel/Dockerfile
-
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
         cuda-libraries-dev-$CUDA_PKG_VERSION \
         cuda-nvml-dev-$CUDA_PKG_VERSION \
@@ -61,7 +65,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
 # Support for Nvidia docker v2
-
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config \
         libxau-dev \
@@ -70,15 +74,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libxext-dev \
         libx11-dev && \
     rm -rf /var/lib/apt/lists/*
-COPY --from=nvidia/opengl:1.0-glvnd-runtime-ubuntu16.04 \
+COPY --from=glvnd_runtime \
   /usr/local/lib/x86_64-linux-gnu \
   /usr/lib/x86_64-linux-gnu
-COPY --from=nvidia/opengl:1.0-glvnd-runtime-ubuntu16.04 \
+COPY --from=glvnd_runtime \
   /usr/local/share/glvnd/egl_vendor.d/10_nvidia.json \
   /usr/local/share/glvnd/egl_vendor.d/10_nvidia.json
 RUN echo '/usr/local/lib/x86_64-linux-gnu' >> /etc/ld.so.conf.d/glvnd.conf && \
     ldconfig
-RUN apt-get update
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
