@@ -29,6 +29,7 @@ libxi-dev
 libxmu-dev
 libyaml-cpp-dev
 python-flask
+python-psutil
 python-requests
 python-serial
 qtbase5-dev
@@ -62,6 +63,7 @@ ros-$ROS_DISTRO-jsk-rviz-plugins
 ros-$ROS_DISTRO-jsk-topic-tools
 ros-$ROS_DISTRO-lgsvl-msgs
 ros-$ROS_DISTRO-nmea-msgs
+ros-$ROS_DISTRO-nmea-navsat-driver
 ros-$ROS_DISTRO-pacmod-msgs
 ros-$ROS_DISTRO-pcl-conversions
 ros-$ROS_DISTRO-pcl-msgs
@@ -82,6 +84,7 @@ ros-$ROS_DISTRO-tf2
 ros-$ROS_DISTRO-tf2-geometry-msgs
 ros-$ROS_DISTRO-tf2-ros
 ros-$ROS_DISTRO-transmission-interface
+ros-$ROS_DISTRO-uvc-camera
 ros-$ROS_DISTRO-velocity-controllers
 ros-$ROS_DISTRO-velodyne
 ros-$ROS_DISTRO-velodyne-description
