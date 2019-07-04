@@ -144,7 +144,7 @@ docker run \
     $VOLUMES \
     --env="XAUTHORITY=${XAUTH}" \
     --env="DISPLAY=${DISPLAY}" \
-    --env="USER_ID=$(id -u)" \
+    --user $(id -u):$(id -g) \
     --privileged \
     --net=host \
     $RUNTIME \
