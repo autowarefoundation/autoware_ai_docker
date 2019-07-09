@@ -54,23 +54,23 @@ Same as above, but with ROS Melodic and Ubuntu 18.04. Default image:
 _autoware/autoware:latest-melodic-cuda_
 
 ```
-$ ./run.sh --base
+$ ./run.sh --base-only <autoware_home>
 ```
 Will start a container with the base image (without pre-built Autoware). The
-container will have Cuda enabled and the Autoware code base you are running
-**run.sh** from will be mounted as a volume on the container under
-_/home/autoware/Autoware_. This is the suggested image for developers using
-Docker as their development environment. Default docker image:
+container will have Cuda enabled and the Autoware code base at path `<autoware_home>`
+will be mounted as a volume on the container under _/home/autoware/Autoware_.
+This is the suggested image for developers using Docker as their development
+environment. Default docker image:
 _autoware/autoware:latest-kinetic-base-cuda_
 
 ```
-$ ./run.sh --ros-distro melodic --base
+$ ./run.sh --ros-distro melodic --base-only <autoware_home>
 ```
 Same as above but with ROS Melodic and Ubuntu 18.04. Default image:
 _autoware/autoware:latest-melodic-base-cuda_
 
 ```
-$ ./run.sh --base --cuda off
+$ ./run.sh --base-only <autoware_home> --cuda off
 ```
 Same as previous example, but Cuda support is disabled. This is useful if you
 are running on a machine without Cuda support. Note that packages that require
@@ -78,20 +78,20 @@ Cuda will not be built or will execute on CPU. Default image:
 _autoware/autoware:latest-kinetic-base_
 
 ```
-$ ./run.sh --ros-distro melodic --base --cuda off
+$ ./run.sh --ros-distro melodic --base-only <autoware_home> --cuda off
 ```
 Same as above but with ROS Melodic and Ubuntu 18.04. Default image:
 _autoware/autoware:latest-melodic-base_
 
 ```
-./run.sh --tag-prefix local --base
+./run.sh --tag-prefix local --base-only <autoware_home>
 ```
 Will start a container with the tag prefix _local_. Note that _local_ is the
 default tag prefix when using the **build.sh** tool. Image name:
 _autoware/autoware:local-kinetic-base-cuda_
 
 ```
-./run.sh --ros-distro melodic --tag-prefix local --base
+./run.sh --ros-distro melodic --tag-prefix local --base-only <autoware_home>
 ```
 Same as above but with ROS Melodic and Ubuntu 18.04. Image name:
 _autoware/autoware:local-melodic-base-cuda_
@@ -111,3 +111,8 @@ images you have built, make sure the parameters mentioned match.
 * Containers started with the **run.sh** tool are automatically removed upon
 exiting the container. Make sure you use the _shared_dir_ to save any data you
 want to preserve.
+
+* `run.sh` can be called with the `--skip-uid-fix` flag to disable automatic fixing
+of uid and directory permissions in the container. Using this flag will reduce the
+initialization time if the host user does not match the default user ID in the Docker
+image but the `shared_dir` volume will not be accessible.
