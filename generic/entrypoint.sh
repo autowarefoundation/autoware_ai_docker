@@ -1,20 +1,29 @@
 #!/bin/bash
+
 set -e
 
-NEW_USER_ID=$(id -u)
+DEFAULT_USER_ID=1000
+
+#
+# Ensure host and container have the same user ID. This is to allow both sides
+# to read and write the shared directories.
+#
+if [ -v USER_ID ] && [ "$USER_ID" != "$DEFAULT_USER_ID" ]; then
+    echo "Changing autoware user ID to match your host's user ID ($USER_ID)." 
+    echo "This operation can take a while..."
+
+    usermod --uid $USER_ID autoware
+
+    # Ensure all files in the home directory are owned by the new user ID
+    find /home/autoware -user $DEFAULT_USER_ID -exec chown -h $USER_ID {} \;
+fi
 
 cd /home/autoware
 
-if [[ $NEW_USER_ID -ne 0 ]]; then
-  if [ -z "$1" ]; then
-    exec sudo gosu autoware /bin/bash -l
-  else
-    exec sudo gosu autoware "$@"
-  fi
-else
-  if [ -z "$1" ]; then
-    exec gosu autoware /bin/bash -l
-  else
-    exec gosu autoware "$@"
-  fi
+# If no command is provided, set bash to start interactive shell
+if [ -z "$1" ]; then
+    set - "/bin/bash" -l
 fi
+
+# Run the provided command using user 'autoware'
+exec gosu autoware "$@"
