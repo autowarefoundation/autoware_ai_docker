@@ -9,6 +9,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY --from=bootstrap /usr/bin/qemu-${AUTOWARE_TARGET_ARCH}-static /usr/bin/qemu-${AUTOWARE_TARGET_ARCH}-static
 
+# ignore pinning package versions for apt
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -44,7 +45,8 @@ COPY --from=sysroot /etc/alternatives ${AUTOWARE_SYSROOT}/etc/alternatives
 RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" | tee /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
-# hadolint ignore=DL3008
+# ignore pinning package versions for apt and pip
+# hadolint ignore=DL3008,DL3013
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cython \
     crossbuild-essential-arm64 \
@@ -52,8 +54,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-rospkg \
     qt5-qmake \
     qtbase5-dev-tools \
-    ros-kinetic-catkin && \
-    rm -rf /var/lib/apt/lists/*
+    ros-kinetic-catkin \
+    python3-numpy \
+    python3-pip \
+    python3-setuptools \
+    python3-colcon-common-extensions && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip3 install -U setuptools
 
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/kinetic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/kinetic/include#${AUTOWARE_SYSROOT}/opt/ros/kinetic/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/kinetic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/kinetic/lib#${AUTOWARE_SYSROOT}/opt/ros/kinetic/lib#g" {} \;
@@ -72,14 +79,6 @@ RUN sed -i -e "s#set(imported_location \"\${_qt5Core_install_prefix}/lib/${AUTOW
     ${AUTOWARE_SYSROOT}/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake
 RUN sed -i -e "s#define ARMA_SUPERLU_INCLUDE_DIR /usr/include/superlu/#define ARMA_SUPERLU_INCLUDE_DIR ${AUTOWARE_SYSROOT}/usr/include/superlu/#g" \
     ${AUTOWARE_SYSROOT}/usr/include/armadillo_bits/config.hpp
-
-# hadolint ignore=DL3008,DL3013
-RUN apt-get install -y --no-install-recommends \
-    python3-numpy \
-    python3-pip \
-    python3-setuptools \
-    python3-colcon-common-extensions && \
-    pip3 install -U setuptools
 
 ENV ROS_DISTRO kinetic
 ENV CC /usr/bin/${AUTOWARE_TARGET_ARCH}-linux-gnu-gcc
