@@ -1,0 +1,23 @@
+ARG FROM_ARG
+# hadolint ignore=DL3006
+FROM ${FROM_ARG}
+ARG ROS_DISTRO
+ARG VERSION
+
+ENV USERNAME autoware
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Clone Autoware
+WORKDIR /home/$USERNAME
+RUN su -c "bash -c 'git clone --recurse-submodules https://github.com/autowarefoundation/autoware -b $VERSION Autoware'" $USERNAME
+
+# Build Autoware
+WORKDIR /home/$USERNAME/Autoware/ros
+RUN su -c "bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; ./colcon_release'" $USERNAME
+
+RUN echo "source /home/$USERNAME/Autoware/ros/install/local_setup.bash" >> \
+    /home/$USERNAME/.bashrc
+
+COPY ./docker/generic/entrypoint.sh /tmp
+ENTRYPOINT ["/tmp/entrypoint.sh"]
