@@ -13,9 +13,10 @@ libglew-dev
 libglu1-mesa-dev
 libgoogle-glog-dev
 libmosquitto-dev
+libnlopt-dev
 libomp-dev
-libopenmpi-dev
 libopencv-dev
+libopenmpi-dev
 libpcl-dev
 libpugixml-dev
 libqt5core5a

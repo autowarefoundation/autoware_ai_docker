@@ -1,14 +1,17 @@
 ARG FROM_ARG
-ARG ROS_DISTRO
 # hadolint ignore=DL3006
 FROM ${FROM_ARG}
+ARG ROS_DISTRO
+ARG VERSION
 
 ENV USERNAME autoware
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Build Autoware
 RUN su -c "bash -c 'mkdir -p /home/$USERNAME/Autoware/src; \
            cd /home/$USERNAME/Autoware; \
-           wget https://gitlab.com/autowarefoundation/autoware.ai/autoware/raw/master/autoware.ai.repos; \
+           wget https://gitlab.com/autowarefoundation/autoware.ai/autoware/raw/$VERSION/autoware.ai.repos; \
            vcs import src < autoware.ai.repos; \
            source /opt/ros/$ROS_DISTRO/setup.bash; \
            colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'" $USERNAME
