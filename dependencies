@@ -25,6 +25,7 @@ libqt5opengl5
 libqt5opengl5-dev
 libqt5widgets5
 libssh2-1-dev
+libtinyxml-dev
 libx11-dev
 libxi-dev
 libxmu-dev
