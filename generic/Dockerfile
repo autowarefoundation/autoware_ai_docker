@@ -19,5 +19,5 @@ RUN su -c "bash -c 'mkdir -p /home/$USERNAME/Autoware/src; \
 RUN echo "source /home/$USERNAME/Autoware/install/local_setup.bash" >> \
     /home/$USERNAME/.bashrc
 
-COPY ./docker/generic/entrypoint.sh /tmp
+COPY ./entrypoint.sh /tmp
 ENTRYPOINT ["/tmp/entrypoint.sh"]

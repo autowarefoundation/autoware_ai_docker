@@ -20,5 +20,5 @@ RUN su -c "bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
 RUN echo "source /home/$USERNAME/Autoware/ros/devel/setup.bash" >> \
     /home/$USERNAME/.bashrc
 
-COPY ./docker/generic/entrypoint.sh /tmp
+COPY ./entrypoint.sh /tmp
 ENTRYPOINT ["/tmp/entrypoint.sh"]
