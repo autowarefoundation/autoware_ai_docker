@@ -94,17 +94,20 @@ echo -e "\tBase only: $BASE_ONLY"
 
 BASE=$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
 
-# Move up a level to include the dependencies file in the build context
-cd ..
-
 # Update base image of Dockerfile.base so we don't use an outdated one
 docker pull ros:$ROS_DISTRO
+
+# Copy dependencies file into build context
+cp ../dependencies .
 
 docker build \
     --rm \
     --tag $BASE \
     --build-arg ROS_DISTRO=$ROS_DISTRO \
-    --file generic/Dockerfile.base ./..
+    --file Dockerfile.base .
+
+# Remove dependencies file from build context
+rm dependencies
 
 CUDA_SUFFIX=""
 if [ $CUDA == "on" ]; then
@@ -113,7 +116,7 @@ if [ $CUDA == "on" ]; then
         --rm \
         --tag $BASE$CUDA_SUFFIX \
         --build-arg FROM_ARG=$BASE \
-        --file generic/Dockerfile.cuda.$ROS_DISTRO ./generic
+        --file Dockerfile.cuda.$ROS_DISTRO .
 fi
 
 if [ "$BASE_ONLY" == "true" ]; then
@@ -121,7 +124,7 @@ if [ "$BASE_ONLY" == "true" ]; then
     exit 0
 fi
 
-DOCKERFILE="generic/Dockerfile"
+DOCKERFILE="Dockerfile"
 
 if [ -z "$VERSION" ]; then
   VERSION="master"
@@ -143,4 +146,4 @@ docker build \
     --build-arg FROM_ARG=$BASE$CUDA_SUFFIX \
     --build-arg ROS_DISTRO=$ROS_DISTRO \
     --build-arg VERSION=$VERSION \
-    --file $DOCKERFILE ./..
+    --file $DOCKERFILE .

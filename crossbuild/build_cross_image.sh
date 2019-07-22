@@ -14,8 +14,8 @@ then
     # Register QEMU as a handler for non-x86 targets
     docker container run --rm --privileged multiarch/qemu-user-static:register
 
-    # Move up a level to include the dependencies file in the build context
-    cd ..
+    # Copy dependencies file into build context
+    cp ../dependencies .
 
     # Build Docker Image
     docker image build \
@@ -23,7 +23,7 @@ then
         --build-arg AUTOWARE_TARGET_ARCH=${AUTOWARE_TARGET_ARCH} \
         --build-arg AUTOWARE_TARGET_PLATFORM=${AUTOWARE_TARGET_PLATFORM} \
         -t autoware/build:${AUTOWARE_TARGET_PLATFORM}-${AUTOWARE_TARGET_ROS_DISTRO}-${AUTOWARE_DOCKER_DATE} \
-        -f crossbuild/Dockerfile.${AUTOWARE_TARGET_ROS_DISTRO}-crossbuild .
+        -f Dockerfile.${AUTOWARE_TARGET_ROS_DISTRO}-crossbuild .
     if [ "$AUTOWARE_TARGET_PLATFORM" = "driveworks" ]
     then
         docker image build \
@@ -31,8 +31,11 @@ then
         --build-arg AUTOWARE_TARGET_ARCH=${AUTOWARE_TARGET_ARCH} \
         --build-arg AUTOWARE_TARGET_PLATFORM=${AUTOWARE_TARGET_PLATFORM} \
         -t autoware/build:${AUTOWARE_TARGET_PLATFORM}-${AUTOWARE_TARGET_ROS_DISTRO}-${AUTOWARE_DOCKER_DATE} \
-        -f crossbuild/Dockerfile.${AUTOWARE_TARGET_ROS_DISTRO}-crossbuild-driveworks .
+        -f Dockerfile.${AUTOWARE_TARGET_ROS_DISTRO}-crossbuild-driveworks .
     fi
+
+    # Remove dependencies file from build context
+    rm dependencies
 
     # Deregister QEMU as a handler for non-x86 targets
     docker container run --rm --privileged multiarch/qemu-user-static:register --reset
