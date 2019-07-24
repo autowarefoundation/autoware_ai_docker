@@ -28,7 +28,7 @@ RUN apt-get update && \
 # hadolint ignore=SC2156
 RUN find / -depth -xdev -type l -lname '/*' -exec sh -c 'linkpath="$(readlink {})" && rm -f {} && ln -frsv "$linkpath" "{}"' \;
 
-FROM ubuntu:18.04 AS builder
+FROM ros:melodic-ros-core AS builder
 ARG AUTOWARE_TARGET_ARCH
 ARG AUTOWARE_TARGET_PLATFORM
 
@@ -51,9 +51,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     tzdata \
     gnupg && \
     rm -rf /var/lib/apt/lists/*
-
-RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" | tee /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
 # ignore pinning package versions for apt and pip
 # hadolint ignore=DL3008,DL3013
