@@ -27,7 +27,7 @@ RUN apt-get update && \
 # hadolint ignore=SC2156
 RUN find / -depth -xdev -type l -lname '/*' -exec sh -c 'linkpath="$(readlink {})" && rm -f {} && ln -frsv "$linkpath" "{}"' \;
 
-FROM ubuntu:16.04 AS builder
+FROM ros:kinetic-ros-core AS builder
 ARG AUTOWARE_TARGET_ARCH
 ARG AUTOWARE_TARGET_PLATFORM
 
@@ -41,9 +41,6 @@ COPY --from=sysroot /usr/share/OGRE ${AUTOWARE_SYSROOT}/usr/share/OGRE
 COPY --from=sysroot /usr/share/pkgconfig ${AUTOWARE_SYSROOT}/usr/share/pkgconfig
 COPY --from=sysroot /opt ${AUTOWARE_SYSROOT}/opt
 COPY --from=sysroot /etc/alternatives ${AUTOWARE_SYSROOT}/etc/alternatives
-
-RUN echo "deb http://packages.ros.org/ros/ubuntu xenial main" | tee /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
 # ignore pinning package versions for apt and pip
 # hadolint ignore=DL3008,DL3013
