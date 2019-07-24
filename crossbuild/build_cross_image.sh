@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Default settings
 IMAGE_NAME="autoware/build"
 TARGET_PLATFORM="generic-aarch64"

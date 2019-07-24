@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Default settings
 CUDA="on"
 IMAGE_NAME="autoware/autoware"
