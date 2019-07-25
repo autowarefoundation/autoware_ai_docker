@@ -78,7 +78,7 @@ echo ""
 FROM_FILE="Dockerfile.${ROS_DISTRO}-crossbuild"
 
 # Register QEMU as a handler for non-x86 targets
-docker container run --rm --privileged multiarch/qemu-user-static:register
+docker container run --rm --privileged multiarch/qemu-user-static:register --reset
 
 # Copy dependencies file into build context
 cp ../dependencies .
@@ -97,6 +97,3 @@ docker image build \
 
 # Remove dependencies file from build context
 rm dependencies
-
-# Deregister QEMU as a handler for non-x86 targets
-docker container run --rm --privileged multiarch/qemu-user-static:register --reset
