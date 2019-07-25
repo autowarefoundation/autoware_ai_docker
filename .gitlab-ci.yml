@@ -1,5 +1,18 @@
+image: docker:stable
+
+stages:
+  - validate
+  - build-base
+  - build
+#  - test
+#  - deploy
+
+# Temporary fix for https://gitlab.com/gitlab-org/gitlab-ce/issues/64959
+variables:
+  DOCKER_TLS_CERTDIR: ""
+
 dockerfile_lint:
-  stage: test
+  stage: validate
   image: hadolint/hadolint:latest-debian
   script:
     - hadolint generic/Dockerfile
@@ -12,3 +25,275 @@ dockerfile_lint:
     - hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
     - hadolint crossbuild/Dockerfile.melodic-crossbuild
     - hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
+
+.base_script: &base_script
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+    - sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
+    - cd generic
+    # Build base image
+    - ./build.sh -b -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX
+    # Build CUDA variant
+    - ./build.sh -b -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX
+    # Push images
+    - docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
+    - docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
+
+.cross_script: &cross_script
+  services:
+    - docker:dind
+  script:
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+    - sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
+    - cd crossbuild
+    # Build cross-compile image
+    - ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
+    # Push image
+    - docker push $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+
+.cross_vars: &cross_vars
+    IMAGE_NAME: autoware/build
+    DOCKER_ARCH: arm64v8
+    TARGET_ARCH: aarch64
+
+.release_script: &release_script
+  services:
+    - docker:dind
+  script:
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+    - cp dependencies generic/
+    # Build src-included image
+    - docker build --rm
+        --tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO$CUDA_SUFFIX
+        --tag $IMAGE_NAME:latest-$ROS_DISTRO$CUDA_SUFFIX
+        --build-arg FROM_ARG=$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base$CUDA_SUFFIX
+        --build-arg ROS_DISTRO=$ROS_DISTRO
+        --build-arg VERSION=$VERSION
+        --file generic/Dockerfile ./generic
+    # Push images
+    - docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO$CUDA_SUFFIX
+    - docker push $IMAGE_NAME:latest-$ROS_DISTRO$CUDA_SUFFIX
+
+nightly_kinetic:
+  stage: build-base
+  variables:
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: kinetic
+    TAG_PREFIX: bleedingedge
+    VERSION: master
+  << : *base_script
+  script:
+    - echo "Done!"
+  only:
+    - schedules
+    - web
+
+nightly_melodic:
+  stage: build-base
+  variables:
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: melodic
+    TAG_PREFIX: bleedingedge
+    VERSION: master
+  << : *base_script
+  script:
+    - echo "Done!"
+  only:
+    - schedules
+    - web
+
+nightly_kinetic_aarch64_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: kinetic
+    TAG_SUFFIX: bleedingedge
+    TARGET_PLATFORM: generic-aarch64
+  << : *cross_script
+  only:
+    - schedules
+    - web
+
+nightly_melodic_aarch64_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: melodic
+    TAG_SUFFIX: bleedingedge
+    TARGET_PLATFORM: generic-aarch64
+  << : *cross_script
+  only:
+    - schedules
+    - web
+
+nightly_kinetic_synquacer_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: kinetic
+    TAG_SUFFIX: bleedingedge
+    TARGET_PLATFORM: synquacer
+  << : *cross_script
+  only:
+    - schedules
+    - web
+
+nightly_melodic_synquacer_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: melodic
+    TAG_SUFFIX: bleedingedge
+    TARGET_PLATFORM: synquacer
+  << : *cross_script
+  only:
+    - schedules
+    - web
+
+release_base_kinetic:
+  stage: build-base
+  variables:
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: kinetic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *base_script
+  script:
+    # Tag with latest
+    - docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:latest-$ROS_DISTRO-base
+    - docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+    # Push tags
+    - docker push $IMAGE_NAME:latest-$ROS_DISTRO-base
+    - docker push $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_base_melodic:
+  stage: build-base
+  variables:
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: melodic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *base_script
+  script:
+    # Tag with latest
+    - docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:latest-$ROS_DISTRO-base
+    - docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+    # Push tags
+    - docker push $IMAGE_NAME:latest-$ROS_DISTRO-base
+    - docker push $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_kinetic:
+  stage: build
+  dependencies:
+    - release_base_kinetic
+  variables:
+    CUDA_SUFFIX: ""
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: kinetic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *release_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_melodic:
+  stage: build
+  dependencies:
+    - release_base_melodic
+  variables:
+    CUDA_SUFFIX: ""
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: melodic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *release_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_cuda_kinetic:
+  stage: build
+  dependencies:
+    - release_base_kinetic
+  variables:
+    CUDA_SUFFIX: "-cuda"
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: kinetic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *release_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_cuda_melodic:
+  stage: build
+  dependencies:
+    - release_base_melodic
+  variables:
+    CUDA_SUFFIX: "-cuda"
+    IMAGE_NAME: autoware/autoware
+    ROS_DISTRO: melodic
+    TAG_PREFIX: $CI_COMMIT_TAG
+    VERSION: $CI_COMMIT_TAG
+  << : *release_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_kinetic_aarch64_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: kinetic
+    TAG_SUFFIX: $CI_COMMIT_TAG
+    TARGET_PLATFORM: generic-aarch64
+  << : *cross_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_melodic_aarch64_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: melodic
+    TAG_SUFFIX: $CI_COMMIT_TAG
+    TARGET_PLATFORM: generic-aarch64
+  << : *cross_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_kinetic_synquacer_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: kinetic
+    TAG_SUFFIX: $CI_COMMIT_TAG
+    TARGET_PLATFORM: synquacer
+  << : *cross_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
+
+release_melodic_synquacer_cross:
+  stage: build-base
+  variables:
+    << : *cross_vars
+    ROS_DISTRO: melodic
+    TAG_SUFFIX: $CI_COMMIT_TAG
+    TARGET_PLATFORM: synquacer
+  << : *cross_script
+  only:
+    - tags
+    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
