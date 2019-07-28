@@ -1,0 +1,15 @@
+crossbuild-essential-arm64
+cython
+git
+mercurial
+pkg-config
+python-rospkg
+python3-colcon-common-extensions
+python3-numpy
+python3-pip
+python3-setuptools
+python3-vcstool
+qt5-qmake
+qtbase5-dev-tools
+ros-$ROS_DISTRO-catkin
+subversion
