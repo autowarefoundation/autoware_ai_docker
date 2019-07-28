@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install dependent packages used by Autoware
 COPY ./dependencies /tmp/dependencies
 RUN apt-get update && \
-    sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/dependencies" | xargs apt-get install -y && \
+    sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/dependencies" | xargs apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
 # hadolint ignore=SC2156
@@ -42,20 +42,11 @@ COPY --from=sysroot /usr/share/pkgconfig ${AUTOWARE_SYSROOT}/usr/share/pkgconfig
 COPY --from=sysroot /opt ${AUTOWARE_SYSROOT}/opt
 COPY --from=sysroot /etc/alternatives ${AUTOWARE_SYSROOT}/etc/alternatives
 
+COPY ./cross-dependencies /tmp/cross-dependencies
 # ignore pinning package versions for apt and pip
 # hadolint ignore=DL3008,DL3013
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    cython \
-    crossbuild-essential-arm64 \
-    pkg-config \
-    python-rospkg \
-    qt5-qmake \
-    qtbase5-dev-tools \
-    ros-kinetic-catkin \
-    python3-numpy \
-    python3-pip \
-    python3-setuptools \
-    python3-colcon-common-extensions && \
+RUN apt-get update && \
+    sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/cross-dependencies" | xargs apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install -U setuptools
 
