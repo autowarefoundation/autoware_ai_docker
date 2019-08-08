@@ -37,6 +37,12 @@ python-serial
 qtbase5-dev
 ros-$ROS_DISTRO-automotive-navigation-msgs
 ros-$ROS_DISTRO-automotive-platform-msgs
+ros-$ROS_DISTRO-autoware-can-msgs
+ros-$ROS_DISTRO-autoware-config-msgs
+ros-$ROS_DISTRO-autoware-external-msgs
+ros-$ROS_DISTRO-autoware-map-msgs
+ros-$ROS_DISTRO-autoware-msgs
+ros-$ROS_DISTRO-autoware-system-msgs
 ros-$ROS_DISTRO-camera-info-manager
 ros-$ROS_DISTRO-controller-manager
 ros-$ROS_DISTRO-cv-bridge
@@ -80,6 +86,7 @@ ros-$ROS_DISTRO-rqt-gui-py
 ros-$ROS_DISTRO-rqt-plot
 ros-$ROS_DISTRO-rviz
 ros-$ROS_DISTRO-sound-play
+ros-$ROS_DISTRO-tablet-socket-msgs
 ros-$ROS_DISTRO-tf
 ros-$ROS_DISTRO-tf-conversions
 ros-$ROS_DISTRO-tf2
@@ -87,6 +94,7 @@ ros-$ROS_DISTRO-tf2-geometry-msgs
 ros-$ROS_DISTRO-tf2-ros
 ros-$ROS_DISTRO-transmission-interface
 ros-$ROS_DISTRO-uvc-camera
+ros-$ROS_DISTRO-vector-map-msgs
 ros-$ROS_DISTRO-velocity-controllers
 ros-$ROS_DISTRO-velodyne
 ros-$ROS_DISTRO-velodyne-description
