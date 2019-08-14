@@ -12,4 +12,4 @@ if [[ "${SOURCE_BRANCH}" =~ "release/" ]]; then
   LATEST_TAG="OFF"
 fi
 
-ROS_DISTRO=kinetic
+ROS_DISTRO=melodic

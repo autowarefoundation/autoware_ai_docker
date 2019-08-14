@@ -6,7 +6,7 @@ set -e
 CUDA="on"
 IMAGE_NAME="autoware/autoware"
 TAG_PREFIX="local"
-ROS_DISTRO="kinetic"
+ROS_DISTRO="melodic"
 BASE_ONLY="false"
 VERSION=""
 

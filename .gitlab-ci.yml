@@ -128,30 +128,6 @@ nightly_melodic_aarch64_cross:
     - schedules
     - web
 
-nightly_kinetic_synquacer_cross:
-  stage: build-base
-  variables:
-    << : *cross_vars
-    ROS_DISTRO: kinetic
-    TAG_SUFFIX: bleedingedge
-    TARGET_PLATFORM: synquacer
-  << : *cross_script
-  only:
-    - schedules
-    - web
-
-nightly_melodic_synquacer_cross:
-  stage: build-base
-  variables:
-    << : *cross_vars
-    ROS_DISTRO: melodic
-    TAG_SUFFIX: bleedingedge
-    TARGET_PLATFORM: synquacer
-  << : *cross_script
-  only:
-    - schedules
-    - web
-
 release_base_kinetic:
   stage: build-base
   variables:
@@ -269,30 +245,6 @@ release_melodic_aarch64_cross:
     ROS_DISTRO: melodic
     TAG_SUFFIX: $CI_COMMIT_TAG
     TARGET_PLATFORM: generic-aarch64
-  << : *cross_script
-  only:
-    - tags
-    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
-
-release_kinetic_synquacer_cross:
-  stage: build-base
-  variables:
-    << : *cross_vars
-    ROS_DISTRO: kinetic
-    TAG_SUFFIX: $CI_COMMIT_TAG
-    TARGET_PLATFORM: synquacer
-  << : *cross_script
-  only:
-    - tags
-    - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
-
-release_melodic_synquacer_cross:
-  stage: build-base
-  variables:
-    << : *cross_vars
-    ROS_DISTRO: melodic
-    TAG_SUFFIX: $CI_COMMIT_TAG
-    TARGET_PLATFORM: synquacer
   << : *cross_script
   only:
     - tags

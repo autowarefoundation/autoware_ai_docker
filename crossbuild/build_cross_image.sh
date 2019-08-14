@@ -7,7 +7,7 @@ IMAGE_NAME="autoware/build"
 TARGET_PLATFORM="generic-aarch64"
 DOCKER_ARCH="arm64v8"
 LINUX_ARCH="aarch64"
-ROS_DISTRO="kinetic"
+ROS_DISTRO="melodic"
 TAG_SUFFIX="local"
 
 function usage() {
@@ -17,7 +17,7 @@ function usage() {
     echo "                           Default: $IMAGE_NAME"
     echo "    -p,--platform <name>   Set the target platform/architecture."
     echo "                           Default: $TARGET_PLATFORM"
-    echo "                           Valid: generic-aarch64, synquacer, driveworks"
+    echo "                           Valid: generic-aarch64, driveworks"
     echo "    -r,--ros-distro <name> Set ROS distribution name."
     echo "                           Default: $ROS_DISTRO"
     echo "    -t,--tag-suffix <tag>  Tag suffix to use for docker images."
