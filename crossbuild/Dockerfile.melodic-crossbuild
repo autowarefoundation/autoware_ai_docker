@@ -68,6 +68,7 @@ RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/share/ -name "*.cmake" -type f -exe
 RUN find ${AUTOWARE_SYSROOT}/usr/lib/cmake/ -name "*.cmake" -type f -exec sed -i -e "s#/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu#${AUTOWARE_SYSROOT}/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/usr/lib/cmake/ -name "*.cmake" -type f -exec sed -i -e "s#/usr/lib/openmpi#${AUTOWARE_SYSROOT}/usr/lib/openmpi#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/usr/lib/cmake/ -name "*.cmake" -type f -exec sed -i -e "s#/usr/include#${AUTOWARE_SYSROOT}/usr/include#g" {} \;
+RUN find ${AUTOWARE_SYSROOT}/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu/cmake/ -name "*.cmake" -type f -exec sed -i -e "s#/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu#${AUTOWARE_SYSROOT}/usr/lib/${AUTOWARE_TARGET_ARCH}-linux-gnu#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/lib/pkgconfig/ -name "*.pc" -type f -exec sed -i -e "s#-I/opt/ros/melodic/usr/include#-I${AUTOWARE_SYSROOT}/opt/ros/melodic/usr/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/lib/pkgconfig/ -name "*.pc" -type f -exec sed -i -e "s#-I/usr/include#-I${AUTOWARE_SYSROOT}/usr/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/ -name "*.pc" -type f -exec sed -i -e "s#prefix=/#prefix=${AUTOWARE_SYSROOT}/#g" {} \;
