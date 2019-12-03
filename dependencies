@@ -65,6 +65,7 @@ ros-$ROS_DISTRO-image-view2
 ros-$ROS_DISTRO-imu-filter-madgwick
 ros-$ROS_DISTRO-imu-tools
 ros-$ROS_DISTRO-joint-state-controller
+ros-$ROS_DISTRO-joint-state-publisher
 ros-$ROS_DISTRO-jsk-recognition-msgs
 ros-$ROS_DISTRO-jsk-recognition-utils
 ros-$ROS_DISTRO-jsk-rviz-plugins
