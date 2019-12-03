@@ -79,6 +79,7 @@ ros-$ROS_DISTRO-pcl-msgs
 ros-$ROS_DISTRO-pcl-ros
 ros-$ROS_DISTRO-position-controllers
 ros-$ROS_DISTRO-python-qt-binding
+ros-$ROS_DISTRO-qpoases-vendor
 ros-$ROS_DISTRO-robot-state-publisher
 ros-$ROS_DISTRO-rosbridge-server
 ros-$ROS_DISTRO-roslint
