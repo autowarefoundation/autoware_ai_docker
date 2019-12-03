@@ -62,6 +62,40 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
+#cuDNN and Tensorrt Install
+
+ENV CUDNN_VERSION 7.6.5.32-1+cuda10.0
+ENV TENSORRT_VERSION 6.0.1-1+cuda10.0
+RUN apt-get update && \
+apt-get install -y --no-install-recommends \
+        libcudnn7=${CUDNN_VERSION} \
+        libcudnn7-dev=${CUDNN_VERSION} \
+        libnvinfer6=${TENSORRT_VERSION} \
+        libnvonnxparsers6=${TENSORRT_VERSION} \
+        libnvparsers6=${TENSORRT_VERSION} \
+        libnvinfer-plugin6=${TENSORRT_VERSION} \
+        libnvinfer-dev=${TENSORRT_VERSION} \
+        libnvonnxparsers-dev=${TENSORRT_VERSION} \
+        libnvparsers-dev=${TENSORRT_VERSION} \
+        libnvinfer-plugin-dev=${TENSORRT_VERSION} \
+        python-libnvinfer=${TENSORRT_VERSION} \
+        python3-libnvinfer=${TENSORRT_VERSION} && \
+apt-mark hold \
+        libcudnn7 \
+        libcudnn7-dev \
+        libnvinfer6 \
+        libnvonnxparsers6 \
+        libnvparsers6 \
+        libnvinfer-plugin6 \
+        libnvinfer-dev \
+        libnvonnxparsers-dev \
+        libnvparsers-dev \
+        libnvinfer-plugin-dev \
+        python-libnvinfer \
+        python3-libnvinfer && \
+rm -rf /var/lib/apt/lists/*
+
+
 # Fix bug with CUDA and Eigen <= 3.3.7
 
 WORKDIR /tmp
