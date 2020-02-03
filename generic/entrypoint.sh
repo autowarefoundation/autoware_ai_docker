@@ -26,4 +26,4 @@ if [ -z "$1" ]; then
 fi
 
 # Run the provided command using user 'autoware'
-exec gosu autoware "$@"
+exec "$@"
