@@ -3,6 +3,8 @@ FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu16.04 as glvnd_runtime
 # hadolint ignore=DL3006
 FROM ${FROM_ARG}
 
+USER root
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # From nvidia cuda 9.0 base: https://gitlab.com/nvidia/cuda/tree/ubuntu16.04/9.0/base/Dockerfile
@@ -89,4 +91,5 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 ENV AUTOWARE_COMPILE_WITH_CUDA ON
 
+USER autoware
 ENTRYPOINT ["/tmp/entrypoint.sh"]
