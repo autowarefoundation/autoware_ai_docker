@@ -85,7 +85,10 @@ echo "Using options:"
 
 if [ ! -z "$VERSION" ]; then
   echo -e "\tVersion: $VERSION"
-  TAG_PREFIX=$VERSION
+
+  if [ "$VERSION" != "master" ]; then
+    TAG_PREFIX=$VERSION
+  fi
 fi
 
 echo -e "\tROS distro: $ROS_DISTRO"
