@@ -23,6 +23,9 @@ dockerfile_lint:
     - hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
     - hadolint crossbuild/Dockerfile.melodic-crossbuild
     - hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
+  except:
+    - schedules
+    - web
 
 .common_lines:
   - &DOCKER_LOGIN docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
