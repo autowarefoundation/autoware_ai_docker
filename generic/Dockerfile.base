@@ -75,10 +75,8 @@ RUN groupadd --gid $GROUP_ID $USERNAME && \
 # Startup scripts
 ENV LANG="en_US.UTF-8"
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /etc/profile.d/ros.sh && \
-        # Fix for QT and X server errors
-        echo "export QT_X11_NO_MITSHM=1" >> /etc/profile.d/autoware.sh && \
-        # Set defaut language
-        echo "export LANG=\"en_US.UTF-8\"" >> /etc/profile.d/autoware.sh
+    echo "export QT_X11_NO_MITSHM=1" >> /etc/profile.d/autoware.sh && \
+    echo "export LANG=\"en_US.UTF-8\"" >> /etc/profile.d/autoware.sh
 
 #
 # Install ROS packages used by Autoware
