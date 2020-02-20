@@ -43,11 +43,25 @@ dockerfile_lint:
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
     - cd generic
 
+.base_script_no_login: &base_script_no_login
+  services:
+    - docker:dind
+  before_script:
+    - sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
+    - cd generic
+
 .cross_script: &cross_script
   services:
     - docker:dind
   before_script:
     - *DOCKER_LOGIN
+    - sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
+    - cd crossbuild
+
+.cross_script_no_login: &cross_script_no_login
+  services:
+    - docker:dind
+  before_script:
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
     - cd crossbuild
 
@@ -64,7 +78,7 @@ mr_melodic:
     ROS_DISTRO: melodic
     TAG_PREFIX: mrtest
     VERSION: master
-  << : *base_script
+  << : *base_script_no_login
   script:
     - *BUILD_AW_INC
   only:
@@ -77,24 +91,9 @@ mr_melodic_cuda:
     ROS_DISTRO: melodic
     TAG_PREFIX: mrtest
     VERSION: master
-  << : *base_script
+  << : *base_script_no_login
   script:
     - *BUILD_AW_INC_CUDA
-  only:
-    - merge_requests
-
-mr_melodic_aarch64_native:
-  tags:
-    - arm64
-  stage: build
-  variables:
-    IMAGE_NAME: autoware/arm64v8
-    ROS_DISTRO: melodic
-    TAG_PREFIX: mrtest
-    VERSION: master
-  << : *base_script
-  script:
-    - *BUILD_AW_INC
   only:
     - merge_requests
 
@@ -104,7 +103,7 @@ mr_melodic_aarch64_cross:
     << : *cross_vars
     ROS_DISTRO: melodic
     TAG_SUFFIX: mrtest
-  << : *cross_script
+  << : *cross_script_no_login
   script:
     - *BUILD_CROSS
   only:
