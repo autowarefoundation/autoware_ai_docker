@@ -61,6 +61,7 @@ ros-$ROS_DISTRO-grid-map-visualization
 ros-$ROS_DISTRO-gscam
 ros-$ROS_DISTRO-image-geometry
 ros-$ROS_DISTRO-image-transport
+ros-$ROS_DISTRO-image-transport-plugins
 ros-$ROS_DISTRO-image-view2
 ros-$ROS_DISTRO-imu-filter-madgwick
 ros-$ROS_DISTRO-imu-tools
