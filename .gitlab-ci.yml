@@ -37,7 +37,7 @@ dockerfile_lint:
 
 .base_script: &base_script
   services:
-    - docker:19.03.5-dind
+    - docker:dind
   before_script:
     - *DOCKER_LOGIN
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
@@ -45,14 +45,14 @@ dockerfile_lint:
 
 .base_script_no_login: &base_script_no_login
   services:
-    - docker:19.03.5-dind
+    - docker:dind
   before_script:
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
     - cd generic
 
 .cross_script: &cross_script
   services:
-    - docker:19.03.5-dind
+    - docker:dind
   before_script:
     - *DOCKER_LOGIN
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
@@ -60,7 +60,7 @@ dockerfile_lint:
 
 .cross_script_no_login: &cross_script_no_login
   services:
-    - docker:19.03.5-dind
+    - docker:dind
   before_script:
     - sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
     - cd crossbuild
