@@ -31,6 +31,7 @@ libxi-dev
 libxmu-dev
 libyaml-cpp-dev
 python-flask
+python-pandas
 python-psutil
 python-requests
 python-serial
@@ -74,6 +75,7 @@ ros-$ROS_DISTRO-jsk-topic-tools
 ros-$ROS_DISTRO-lgsvl-msgs
 ros-$ROS_DISTRO-nmea-msgs
 ros-$ROS_DISTRO-nmea-navsat-driver
+ros-$ROS_DISTRO-mrt-cmake-modules
 ros-$ROS_DISTRO-pacmod-msgs
 ros-$ROS_DISTRO-pcl-conversions
 ros-$ROS_DISTRO-pcl-msgs
