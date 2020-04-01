@@ -44,6 +44,7 @@ ros-$ROS_DISTRO-autoware-external-msgs
 ros-$ROS_DISTRO-autoware-map-msgs
 ros-$ROS_DISTRO-autoware-msgs
 ros-$ROS_DISTRO-autoware-system-msgs
+ros-$ROS_DISTRO-carla-msgs
 ros-$ROS_DISTRO-camera-info-manager
 ros-$ROS_DISTRO-controller-manager
 ros-$ROS_DISTRO-cv-bridge
