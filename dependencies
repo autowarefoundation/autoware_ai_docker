@@ -13,6 +13,7 @@ libglew-dev
 libglu1-mesa-dev
 libgoogle-glog-dev
 libmosquitto-dev
+libnl-3-dev
 libnlopt-dev
 libomp-dev
 libopencv-dev
@@ -30,6 +31,7 @@ libx11-dev
 libxi-dev
 libxmu-dev
 libyaml-cpp-dev
+ntpdate
 python-flask
 python-pandas
 python-psutil
@@ -107,4 +109,5 @@ ros-$ROS_DISTRO-velodyne-description
 ros-$ROS_DISTRO-velodyne-gazebo-plugins
 ros-$ROS_DISTRO-velodyne-pointcloud
 ros-$ROS_DISTRO-xacro
+sysstat
 v4l-utils
