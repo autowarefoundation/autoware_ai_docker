@@ -51,6 +51,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pip3 install -U setuptools && \
         rm -rf /var/lib/apt/lists/*
 
+# System monitor needs tool
+# ignore pinning package versions for apt
+# hadolint ignore=DL3008
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    smartmontools && \
+    rm -rf /var/lib/apt/lists/*
+
 #
 # Configure environmet
 #

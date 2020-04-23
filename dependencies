@@ -14,6 +14,7 @@ libglu1-mesa-dev
 libgoogle-glog-dev
 libmosquitto-dev
 libnl-3-dev
+libnl-genl-3-dev
 libnlopt-dev
 libomp-dev
 libopencv-dev
