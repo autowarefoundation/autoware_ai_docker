@@ -184,6 +184,8 @@ release_melodic_base:
     - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
 
 release_melodic_base_aarch64_native:
+  tags:
+    - arm64
   stage: build-base
   variables:
     IMAGE_NAME: autoware/arm64v8
@@ -245,6 +247,8 @@ release_melodic_cuda:
     - /^[0-9]+\.[0-9]+\.[0-9]+.*$/
 
 release_melodic_aarch64_native:
+  tags:
+    - arm64
   stage: build
   dependencies:
     - release_melodic_base_aarch64_native
