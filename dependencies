@@ -90,6 +90,7 @@ ros-$ROS_DISTRO-qpoases-vendor
 ros-$ROS_DISTRO-robot-state-publisher
 ros-$ROS_DISTRO-rosbridge-server
 ros-$ROS_DISTRO-roslint
+ros-$ROS_DISTRO-rqt-graph
 ros-$ROS_DISTRO-rqt-gui
 ros-$ROS_DISTRO-rqt-gui-py
 ros-$ROS_DISTRO-rqt-plot
