@@ -1,4 +1,4 @@
-<div align="center"><img src="docs/images/autoware_logo_1.png" width="400"/></div>
+<div align="center"><img src=" https://gitlab.com/autowarefoundation/autoware.ai/autoware/-/raw/master/docs/images/autoware_logo_1.png?inline=false" width="400"/></div>
 
 [Autoware](https://www.autoware.org) is an "all-in-one" open-source software framework for self-driving vehicles.
 The capabilities of Autoware are primarily well-suited for urban cities, but highways, freeways, mountaineous regions, and geofenced areas can be also covered.
