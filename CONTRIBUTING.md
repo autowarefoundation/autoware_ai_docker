@@ -7,14 +7,15 @@ we adhere to the [Contributor Covenant](https://www.contributor-covenant.org/), 
 used [code of conduct](/CODE_OF_CONDUCT.md) adopted by many other communities such as
 Linux, Ruby on Rails and GitLab.
 
-Everyone participating in the Autoware community is expected to follow the code of conduct.
+Everyone participating in the Autoware.AI community is expected to follow the code of
+conduct.
 
 If someone in the community happens to be violating these terms, please let the project
 leads know, and we will address it as soon as possible.
 
 ## License
 
-Autoware is licensed under Apache 2, and thus all contributions will be licensed as such
+Autoware.AI is licensed under Apache 2, and thus all contributions will be licensed as such
 as per clause 5 of the Apache 2 License:
 
 ~~~
@@ -29,7 +30,7 @@ as per clause 5 of the Apache 2 License:
 
 ## Detailed contribution guidelines
 
-For more detailed information on contributing to Autoware, including development processes,
-please see the contributing guidelines on the Autoware Wiki:
+For more detailed information on contributing to Autoware.AI, please see the contributing
+guidelines on the Autoware Wiki:
 
-https://gitlab.com/autowarefoundation/autoware.ai/autoware/wikis/Contributing-to-Autoware
+https://github.com/Autoware-AI/autoware.ai/wiki/Contributing-to-Autoware
