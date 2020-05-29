@@ -1,5 +1,3 @@
 # Support
 
-To get support for Autoware, see the support guidelines on the Autoware wiki:
-
-http://gitlab.com/autowarefoundation/autoware.ai/autoware/wikis/Support-guidelines
+For detailed instructions on getting help, see the [support guidelines](https://github.com/Autoware-AI/autoware.ai/wiki/Support-guidelines).
