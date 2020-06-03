@@ -1,0 +1,33 @@
+name: Nightly build
+
+on:
+  push:
+    branches: master
+  #schedule:
+  #  - cron: "0 1 * * *"
+
+jobs:
+
+  dockerfile-lint:
+    runs-on: ubuntu-latest
+
+    container:
+      image: hadolint/hadolint:latest-debian
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Linting
+        run: |
+          hadolint generic/Dockerfile
+          hadolint generic/Dockerfile.legacy.catkin
+          hadolint generic/Dockerfile.legacy.colcon
+          hadolint generic/Dockerfile.base
+          hadolint generic/Dockerfile.cuda.kinetic
+          hadolint generic/Dockerfile.cuda.melodic
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
+          hadolint crossbuild/Dockerfile.melodic-crossbuild
+          hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
