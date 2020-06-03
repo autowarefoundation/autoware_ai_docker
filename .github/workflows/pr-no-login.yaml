@@ -3,7 +3,7 @@ name: PR No login
 on:
   pull_request:
   push:
-    branches: master
+    branches: disabled
   #schedule:
   #  - cron: "0 1 * * *"
 
