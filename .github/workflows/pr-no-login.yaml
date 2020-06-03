@@ -1,6 +1,7 @@
-name: Nightly build
+name: PR No login
 
 on:
+  pull_request:
   push:
     branches: master
   #schedule:
@@ -32,14 +33,14 @@ jobs:
           hadolint crossbuild/Dockerfile.melodic-crossbuild
           hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
 
-  build-base:
+  pr-melodic:
     needs: dockerfile-lint
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/autoware
       ROS_DISTRO: melodic
-      TAG_PREFIX: bleedingedge
+      TAG_PREFIX: mrtest
       VERSION: master
 
     steps:
@@ -49,20 +50,17 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
-          #sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
           cd generic
-          ./build.sh -b -c off -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
+          ./build.sh -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
-  build-base-cuda:
+  pr-melodic-cuda:
     needs: dockerfile-lint
 
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: autoware_github_actions
       ROS_DISTRO: melodic
-      TAG_PREFIX: bleedingedge
+      TAG_PREFIX: mrtest
       VERSION: master
 
     steps:
@@ -72,13 +70,10 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
-          #sed -i 's/\/bin\/bash/\/bin\/sh/g' generic/build.sh
           cd generic
-          ./build.sh -b -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
+          ./build.sh -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
-  build-aarch64-cross:
+  pr-melodic-aarch64-cross:
     needs: dockerfile-lint
 
     runs-on: ubuntu-latest
@@ -88,7 +83,7 @@ jobs:
       TARGET_ARCH: aarch64
       TARGET_PLATFORM: generic-aarch64
       ROS_DISTRO: melodic
-      TAG_SUFFIX: bleedingedge
+      TAG_SUFFIX: mrtest
       VERSION: master
 
     steps:
@@ -98,9 +93,5 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
-          #sed -i 's/\/bin\/bash/\/bin\/sh/g' crossbuild/build_cross_image.sh
           cd crossbuild
           ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
-          docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
