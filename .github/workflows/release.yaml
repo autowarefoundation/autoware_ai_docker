@@ -28,8 +28,6 @@ jobs:
 
 
   dockerfile-lint:
-    needs: get-tag
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,9 +38,6 @@ jobs:
       image: hadolint/hadolint:latest-debian
 
     steps:
-
-      - name: Echo tag
-        run: echo ${{ needs.get-tag.outputs.tag_ref }}
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -153,16 +148,16 @@ jobs:
       - name: amd64 image re-tag and push
         if: contains(matrix.os, 'ubuntu-latest')
         run: |
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-amd64
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-amd64
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-amd64
 
       - name: arm64v8 image re-tag and push
         if: contains(matrix.os, 'self-hosted')
         run: |
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
 
@@ -186,7 +181,8 @@ jobs:
           docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           cd generic
           ./build.sh -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-cuda
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-cuda
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-cuda
 
