@@ -126,6 +126,11 @@ jobs:
     needs: build-base
 
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware_github_actions
+      ROS_DISTRO: melodic
+      TAG_PREFIX: bleedingedge
+      VERSION: master
 
     steps:
 
