@@ -52,14 +52,6 @@ jobs:
 
     steps:
 
-      - name: Check OS
-        if: contains(matrix.os, 'ubuntu-latest')
-        run: echo "I'm ubuntu"
-        
-      - name: Check arm
-        if: contains(matrix.os, 'self-hosted')
-        run: echo "I'm localhost"
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -69,17 +61,17 @@ jobs:
           cd generic
           ./build.sh -b -c off -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
-      - name: Amd64 image re-tag and push
+      - name: amd64 image re-tag and push
         if: contains(matrix.os, 'ubuntu-latest')
         run: |
           docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
 
-      - name: arm64 image re-tag and push
+      - name: arm64v8 image re-tag and push
         if: contains(matrix.os, 'self-hosted')
         run: |
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
+          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
 
   build-base-cuda:
     needs: dockerfile-lint
@@ -93,7 +85,7 @@ jobs:
 
     steps:
 
-      - name: Checkout
+      - name: Checkout${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
         uses: actions/checkout@v2
 
       - name: Image build and push
@@ -128,3 +120,20 @@ jobs:
           ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
           docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+
+
+  amd64-arm64v8-bundle:
+    needs: build-base
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker manifest create ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64 --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker manifest push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
