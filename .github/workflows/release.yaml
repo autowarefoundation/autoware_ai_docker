@@ -213,9 +213,8 @@ jobs:
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
           docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-latest
 
-
-  amd64-arm64v8-bundle:
-    needs: [get-tag, release-melodic-base, release-melodic]
+  amd64-arm64v8-base-bundle:
+    needs: [get-tag, release-melodic-base]
 
     runs-on: ubuntu-latest
     env:
@@ -230,6 +229,7 @@ jobs:
         run: |
           docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           export DOCKER_CLI_EXPERIMENTAL=enabled
+
           docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
           docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
           docker manifest create ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64 --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
@@ -239,6 +239,23 @@ jobs:
           docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-base-amd64
           docker manifest create ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-base --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-base-amd64 --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-base-arm64v8
           docker manifest push ${{ secrets.DKR_USR }}/$IMAGE_NAME:latest-$ROS_DISTRO-base
+
+  amd64-arm64v8-full-bundle:
+    needs: [get-tag, release-melodic]
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware_github_actions
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          export DOCKER_CLI_EXPERIMENTAL=enabled
 
           docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
           docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
