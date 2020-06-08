@@ -107,6 +107,7 @@ cp ../dependencies .
 
 docker build \
     --rm \
+    --network=host \
     --tag $BASE \
     --build-arg ROS_DISTRO=$ROS_DISTRO \
     --file Dockerfile.base .
@@ -119,6 +120,7 @@ if [ $CUDA == "on" ]; then
     CUDA_SUFFIX="-cuda"
     docker build \
         --rm \
+        --network=host \
         --tag $BASE$CUDA_SUFFIX \
         --build-arg FROM_ARG=$BASE \
         --file Dockerfile.cuda.$ROS_DISTRO .
@@ -147,6 +149,7 @@ fi
 
 docker build \
     --rm \
+    --network=host \
     --tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO$CUDA_SUFFIX \
     --build-arg FROM_ARG=$BASE$CUDA_SUFFIX \
     --build-arg ROS_DISTRO=$ROS_DISTRO \
