@@ -76,7 +76,9 @@ ros-$ROS_DISTRO-jsk-recognition-msgs
 ros-$ROS_DISTRO-jsk-recognition-utils
 ros-$ROS_DISTRO-jsk-rviz-plugins
 ros-$ROS_DISTRO-jsk-topic-tools
+ros-$ROS_DISTRO-lanelet2
 ros-$ROS_DISTRO-lgsvl-msgs
+ros-$ROS_DISTRO-mrt-cmake-modules
 ros-$ROS_DISTRO-nmea-msgs
 ros-$ROS_DISTRO-nmea-navsat-driver
 ros-$ROS_DISTRO-mrt-cmake-modules
