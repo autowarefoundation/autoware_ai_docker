@@ -1,14 +1,13 @@
 name: Nightly build
 
 on:
-  push:
-    branches: master
-  #schedule:
-  #  - cron: "0 1 * * *"
+  schedule:
+    - cron: "0 1 * * *"
 
 jobs:
 
-  dockerfile-lint:
+  dockerfile-l    branches:
+      - masterint:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -57,7 +56,8 @@ jobs:
 
       - name: Image build
         run: |
-          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          docke    branches:
+      - masterr login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           cd generic
           ./build.sh -b -c off -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
