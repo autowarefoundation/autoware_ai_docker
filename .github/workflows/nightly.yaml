@@ -2,7 +2,7 @@ name: Nightly build
 
 on:
   push:
-    branches: disabled
+    branches: master
   #schedule:
   #  - cron: "0 1 * * *"
 

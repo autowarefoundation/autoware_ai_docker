@@ -3,7 +3,7 @@ name: Release build
 on:
   push:
     branches:
-      - disabled
+      - master
     tags:
       - 1*
 
