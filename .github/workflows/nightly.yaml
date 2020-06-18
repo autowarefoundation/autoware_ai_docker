@@ -1,13 +1,17 @@
 name: Nightly build
 
 on:
+  push:
+    branches: master
   schedule:
     - cron: "0 1 * * *"
 
 jobs:
 
-  dockerfile-l    branches:
-      - masterint:
+  dockerfile-lint:
+
+    if: github.repository_owner == 'Autoware-AI'
+
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -36,6 +40,9 @@ jobs:
           hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
 
   build-base:
+
+    if: github.repository_owner == 'sgermanserrano'
+
     needs: dockerfile-lint
 
     runs-on: ${{ matrix.os }}
@@ -44,7 +51,7 @@ jobs:
         os: [ubuntu-latest, self-hosted]
       fail-fast: false
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/autoware
       ROS_DISTRO: melodic
       TAG_PREFIX: bleedingedge
       VERSION: master
@@ -56,51 +63,56 @@ jobs:
 
       - name: Image build
         run: |
-          docke    branches:
-      - masterr login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           cd generic
-          ./build.sh -b -c off -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+          ./build.sh -b -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
       - name: amd64 image re-tag and push
         if: contains(matrix.os, 'ubuntu-latest')
         run: |
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
 
       - name: arm64v8 image re-tag and push
         if: contains(matrix.os, 'self-hosted')
         run: |
-          docker tag ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
 
   build-base-cuda:
+
+    if: github.repository_owner == 'sgermanserrano'
+
     needs: dockerfile-lint
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/autoware
       ROS_DISTRO: melodic
       TAG_PREFIX: bleedingedge
       VERSION: master
 
     steps:
 
-      - name: Checkout${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Image build and push
         run: |
           docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           cd generic
-          ./build.sh -b -i ${{ secrets.DKR_USR }}/$IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
+          ./build.sh -b -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
 
   build-aarch64-cross:
+
+    if: github.repository_owner == 'sgermanserrano'
+
     needs: dockerfile-lint
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/build
       DOCKER_ARCH: arm64v8
       TARGET_ARCH: aarch64
       TARGET_PLATFORM: generic-aarch64
@@ -118,16 +130,19 @@ jobs:
           docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           cd crossbuild
           ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
-          docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
-          docker push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+          docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+          docker push $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
 
 
   amd64-arm64v8-bundle:
+
+    if: github.repository_owner == 'sgermanserrano'
+
     needs: build-base
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/autoware
       ROS_DISTRO: melodic
       TAG_PREFIX: bleedingedge
       VERSION: master
@@ -138,7 +153,7 @@ jobs:
         run: |
           docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
           export DOCKER_CLI_EXPERIMENTAL=enabled
-          docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
-          docker pull ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
-          docker manifest create ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64 --amend ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
-          docker manifest push ${{ secrets.DKR_USR }}/$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker manifest create $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64 --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker manifest push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base

@@ -2,10 +2,6 @@ name: PR No login
 
 on:
   pull_request:
-  push:
-    branches: master
-  #schedule:
-  #  - cron: "0 1 * * *"
 
 jobs:
 
@@ -58,7 +54,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/autoware
       ROS_DISTRO: melodic
       TAG_PREFIX: mrtest
       VERSION: master
@@ -78,7 +74,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: autoware_github_actions
+      IMAGE_NAME: autoware/build
       DOCKER_ARCH: arm64v8
       TARGET_ARCH: aarch64
       TARGET_PLATFORM: generic-aarch64
