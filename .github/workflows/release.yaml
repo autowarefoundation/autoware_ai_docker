@@ -2,8 +2,6 @@ name: Release build
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 1*
 
