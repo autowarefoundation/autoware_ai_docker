@@ -3,7 +3,7 @@ name: Release build
 on:
   push:
     tags:
-      - 1*
+      - '[0-9]*'
 
 jobs:
 
