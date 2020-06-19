@@ -104,7 +104,7 @@ jobs:
 
     steps:
 
-      - name: Checkout$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Image build and push
