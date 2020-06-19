@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Image build and push
+      - name: Image build
         run: |
           cd generic
           ./build.sh -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
@@ -64,7 +64,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Image build and push
+      - name: Image build
         run: |
           cd generic
           ./build.sh -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
@@ -87,7 +87,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Image build and push
+      - name: Image build
         run: |
           cd crossbuild
           ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
