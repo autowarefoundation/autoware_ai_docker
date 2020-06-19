@@ -45,19 +45,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Linting
-        run: |
-          hadolint generic/Dockerfile
-          hadolint generic/Dockerfile.legacy.catkin
-          hadolint generic/Dockerfile.legacy.colcon
-          hadolint generic/Dockerfile.base
-          hadolint generic/Dockerfile.cuda.kinetic
-          hadolint generic/Dockerfile.cuda.melodic
-          hadolint crossbuild/Dockerfile.kinetic-crossbuild
-          hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
-          hadolint crossbuild/Dockerfile.melodic-crossbuild
-          hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
-
   release-melodic-base:
 
     if: github.repository_owner == 'Autoware-AI'
@@ -264,7 +251,7 @@ jobs:
   amd64-arm64v8-full-bundle:
 
     if: github.repository_owner == 'Autoware-AI'
-    
+
     needs: [get-tag, release-melodic]
 
     runs-on: ubuntu-latest
