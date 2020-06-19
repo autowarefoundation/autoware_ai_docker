@@ -41,7 +41,7 @@ jobs:
 
   build-base:
 
-    if: github.repository_owner == 'sgermanserrano'
+    if: github.repository_owner == 'Autoware-AI'
 
     needs: dockerfile-lint
 
@@ -81,7 +81,7 @@ jobs:
 
   build-base-cuda:
 
-    if: github.repository_owner == 'sgermanserrano'
+    if: github.repository_owner == 'Autoware-AI'
 
     needs: dockerfile-lint
 
@@ -106,7 +106,7 @@ jobs:
 
   build-aarch64-cross:
 
-    if: github.repository_owner == 'sgermanserrano'
+    if: github.repository_owner == 'Autoware-AI'
 
     needs: dockerfile-lint
 
@@ -136,7 +136,7 @@ jobs:
 
   amd64-arm64v8-bundle:
 
-    if: github.repository_owner == 'sgermanserrano'
+    if: github.repository_owner == 'Autoware-AI'
 
     needs: build-base
 
