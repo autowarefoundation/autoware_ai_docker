@@ -11,7 +11,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Build Autoware
 RUN bash -c 'mkdir -p /home/$USERNAME/Autoware/src; \
     cd /home/$USERNAME/Autoware; \
-    wget https://gitlab.com/autowarefoundation/autoware.ai/autoware/raw/$VERSION/autoware.ai.repos; \
+    wget https://raw.githubusercontent.com/Autoware-AI/autoware.ai/$VERSION/autoware.ai.repos; \
     vcs import src < autoware.ai.repos; \
     source /opt/ros/$ROS_DISTRO/setup.bash; \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'
