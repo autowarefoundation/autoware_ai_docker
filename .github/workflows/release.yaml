@@ -1,0 +1,260 @@
+name: Release build
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+
+  get-tag:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    runs-on: ubuntu-latest
+    outputs:
+      tag_ref: ${{ steps.get_tag.outputs.tag_ref }}
+
+    steps:
+      - name: Get tag
+        id: get_tag
+        run: |
+          TAG_REF=${{ github.ref }}
+          TAG_REF=`echo $TAG_REF | cut -c11-`
+          echo ::set-output name=tag_ref::$TAG_REF
+
+      - name: Echo tag
+        run: echo ${{ steps.get_tag.outputs.tag_ref }}
+
+  release-melodic-base:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: get-tag
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, self-hosted]
+      fail-fast: false
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          cd generic
+          ./build.sh -b -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+
+      - name: amd64 image re-tag and push
+        if: contains(matrix.os, 'ubuntu-latest')
+        run: |
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:latest-$ROS_DISTRO-base-amd64
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-base-amd64
+
+      - name: arm64v8 image re-tag and push
+        if: contains(matrix.os, 'self-hosted')
+        run: |
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base $IMAGE_NAME:latest-$ROS_DISTRO-base-arm64v8
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-base-arm64v8
+
+  release-melodic-base-cuda:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: get-tag
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          cd generic
+          ./build.sh -b -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-base-cuda
+
+  release-melodic:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: [get-tag, release-melodic-base]
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, self-hosted]
+      fail-fast: false
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          cd generic
+          ./build.sh -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+
+      - name: amd64 image re-tag and push
+        if: contains(matrix.os, 'ubuntu-latest')
+        run: |
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO $IMAGE_NAME:latest-$ROS_DISTRO-amd64
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-amd64
+
+      - name: arm64v8 image re-tag and push
+        if: contains(matrix.os, 'self-hosted')
+        run: |
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO $IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
+
+  release-melodic-cuda:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: [get-tag, release-melodic-base-cuda]
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Checkout$IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-aarch64
+        uses: actions/checkout@v2
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          cd generic
+          ./build.sh -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda
+          docker tag $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda $IMAGE_NAME:latest-$ROS_DISTRO-cuda
+          docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-cuda
+          docker push $IMAGE_NAME:latest-$ROS_DISTRO-cuda
+
+  release-melodic-aarch64-cross:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: get-tag
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/build
+      DOCKER_ARCH: arm64v8
+      TARGET_ARCH: aarch64
+      TARGET_PLATFORM: generic-aarch64
+      ROS_DISTRO: melodic
+      TAG_SUFFIX: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          cd crossbuild
+          ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
+          docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+          docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-latest
+          docker push $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
+          docker push $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-latest
+
+  amd64-arm64v8-base-bundle:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: [get-tag, release-melodic-base]
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
+          docker manifest create $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64 --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
+          docker manifest push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base
+
+          docker pull $IMAGE_NAME:latest-$ROS_DISTRO-base-arm64v8
+          docker pull $IMAGE_NAME:latest-$ROS_DISTRO-base-amd64
+          docker manifest create $IMAGE_NAME:latest-$ROS_DISTRO-base --amend $IMAGE_NAME:latest-$ROS_DISTRO-base-amd64 --amend $IMAGE_NAME:latest-$ROS_DISTRO-base-arm64v8
+          docker manifest push $IMAGE_NAME:latest-$ROS_DISTRO-base
+
+  amd64-arm64v8-full-bundle:
+
+    if: github.repository_owner == 'Autoware-AI'
+
+    needs: [get-tag, release-melodic]
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: ${{ needs.get-tag.outputs.tag_ref }}
+      VERSION: ${{ needs.get-tag.outputs.tag_ref }}
+
+    steps:
+
+      - name: Image build and push
+        run: |
+          docker login -u ${{ secrets.DKR_USR }} -p ${{ secrets.DKR_PASS }}
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
+          docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64
+          docker manifest create $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-amd64 --amend $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-arm64v8
+          docker manifest push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO
+
+          docker pull $IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
+          docker pull $IMAGE_NAME:latest-$ROS_DISTRO-amd64
+          docker manifest create $IMAGE_NAME:latest-$ROS_DISTRO --amend $IMAGE_NAME:latest-$ROS_DISTRO-amd64 --amend $IMAGE_NAME:latest-$ROS_DISTRO-arm64v8
+          docker manifest push $IMAGE_NAME:latest-$ROS_DISTRO

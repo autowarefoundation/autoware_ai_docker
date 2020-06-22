@@ -1,0 +1,93 @@
+name: PR build
+
+on:
+  pull_request:
+
+jobs:
+
+  dockerfile-lint:
+    runs-on: ubuntu-latest
+
+    container:
+      image: hadolint/hadolint:latest-debian
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Linting
+        run: |
+          hadolint generic/Dockerfile
+          hadolint generic/Dockerfile.legacy.catkin
+          hadolint generic/Dockerfile.legacy.colcon
+          hadolint generic/Dockerfile.base
+          hadolint generic/Dockerfile.cuda.kinetic
+          hadolint generic/Dockerfile.cuda.melodic
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
+          hadolint crossbuild/Dockerfile.melodic-crossbuild
+          hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
+
+  pr-melodic:
+    needs: dockerfile-lint
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: mrtest
+      VERSION: master
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build
+        run: |
+          cd generic
+          ./build.sh -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+
+  pr-melodic-cuda:
+    needs: dockerfile-lint
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/autoware
+      ROS_DISTRO: melodic
+      TAG_PREFIX: mrtest
+      VERSION: master
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build
+        run: |
+          cd generic
+          ./build.sh -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
+
+  pr-melodic-aarch64-cross:
+    needs: dockerfile-lint
+
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: autoware/build
+      DOCKER_ARCH: arm64v8
+      TARGET_ARCH: aarch64
+      TARGET_PLATFORM: generic-aarch64
+      ROS_DISTRO: melodic
+      TAG_SUFFIX: mrtest
+      VERSION: master
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Image build
+        run: |
+          cd crossbuild
+          ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
