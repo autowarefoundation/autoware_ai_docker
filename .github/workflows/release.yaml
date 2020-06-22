@@ -26,25 +26,6 @@ jobs:
       - name: Echo tag
         run: echo ${{ steps.get_tag.outputs.tag_ref }}
 
-
-  dockerfile-lint:
-
-    if: github.repository_owner == 'Autoware-AI'
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      fail-fast: false
-
-    container:
-      image: hadolint/hadolint:latest-debian
-
-    steps:
-
-      - name: Checkout
-        uses: actions/checkout@v2
-
   release-melodic-base:
 
     if: github.repository_owner == 'Autoware-AI'

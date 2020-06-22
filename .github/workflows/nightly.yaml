@@ -8,24 +8,6 @@ on:
 
 jobs:
 
-  dockerfile-lint:
-
-    if: github.repository_owner == 'Autoware-AI'
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      fail-fast: false
-
-    container:
-      image: hadolint/hadolint:latest-debian
-
-    steps:
-
-      - name: Checkout
-        uses: actions/checkout@v2
-
   build-base:
 
     if: github.repository_owner == 'Autoware-AI'
