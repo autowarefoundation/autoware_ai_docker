@@ -30,7 +30,7 @@ jobs:
 
       - name: Image build
         run: |
-          docker login -u '${{ secrets.DKR_USR }}' -p '${{ secrets.DKR_PASS }}'
+          docker login -u "${{ secrets.DKR_USR }}" -p "${{ secrets.DKR_PASS }}"
           cd generic
           ./build.sh -b -c off -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
 
@@ -64,7 +64,7 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u '${{ secrets.DKR_USR }}' -p '${{ secrets.DKR_PASS }}'
+          docker login -u "${{ secrets.DKR_USR }}" -p "${{ secrets.DKR_PASS }}"
           cd generic
           ./build.sh -b -i $IMAGE_NAME -r $ROS_DISTRO -t $TAG_PREFIX -v $VERSION
           docker push $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-cuda
@@ -90,7 +90,7 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u '${{ secrets.DKR_USR }}' -p '${{ secrets.DKR_PASS }}'
+          docker login -u "${{ secrets.DKR_USR }}" -p "${{ secrets.DKR_PASS }}"
           cd crossbuild
           ./build_cross_image.sh -p $TARGET_PLATFORM -r $ROS_DISTRO -t $TAG_SUFFIX
           docker tag autoware/build:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX $IMAGE_NAME:$TARGET_PLATFORM-$ROS_DISTRO-$TAG_SUFFIX
@@ -114,7 +114,7 @@ jobs:
 
       - name: Image build and push
         run: |
-          docker login -u '${{ secrets.DKR_USR }}' -p '${{ secrets.DKR_PASS }}'
+          docker login -u "${{ secrets.DKR_USR }}" -p "${{ secrets.DKR_PASS }}"
           export DOCKER_CLI_EXPERIMENTAL=enabled
           docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-arm64v8
           docker pull $IMAGE_NAME:$TAG_PREFIX-$ROS_DISTRO-base-amd64
