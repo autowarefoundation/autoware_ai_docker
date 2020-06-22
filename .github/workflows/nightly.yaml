@@ -12,8 +12,6 @@ jobs:
 
     if: github.repository_owner == 'Autoware-AI'
 
-    needs: dockerfile-lint
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,8 +50,6 @@ jobs:
 
     if: github.repository_owner == 'Autoware-AI'
 
-    needs: dockerfile-lint
-
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: autoware/autoware
@@ -76,8 +72,6 @@ jobs:
   build-aarch64-cross:
 
     if: github.repository_owner == 'Autoware-AI'
-
-    needs: dockerfile-lint
 
     runs-on: ubuntu-latest
     env:

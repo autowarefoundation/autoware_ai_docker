@@ -30,7 +30,7 @@ jobs:
 
     if: github.repository_owner == 'Autoware-AI'
 
-    needs: [get-tag, dockerfile-lint]
+    needs: get-tag
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -74,7 +74,7 @@ jobs:
 
     if: github.repository_owner == 'Autoware-AI'
 
-    needs: [get-tag, dockerfile-lint]
+    needs: get-tag
 
     runs-on: ubuntu-latest
     env:
@@ -173,7 +173,7 @@ jobs:
 
     if: github.repository_owner == 'Autoware-AI'
 
-    needs: [get-tag, dockerfile-lint]
+    needs: get-tag
 
     runs-on: ubuntu-latest
     env:
