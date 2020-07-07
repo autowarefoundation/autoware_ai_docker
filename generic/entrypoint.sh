@@ -9,7 +9,7 @@ DEFAULT_USER_ID=1000
 # to read and write the shared directories.
 #
 if [ -v USER_ID ] && [ "$USER_ID" != "$DEFAULT_USER_ID" ]; then
-    echo "Changing autoware user ID to match your host's user ID ($USER_ID)." 
+    echo "Changing autoware user ID to match your host's user ID ($USER_ID)."
     echo "This operation can take a while..."
 
     usermod --uid $USER_ID autoware
@@ -26,4 +26,5 @@ if [ -z "$1" ]; then
 fi
 
 # Run the provided command using user 'autoware'
-exec "$@"
+export HOME="/home/autoware/"
+chroot --userspec=autoware:autoware --skip-chdir / "$@"

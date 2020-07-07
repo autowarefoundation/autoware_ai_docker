@@ -4,6 +4,7 @@ FROM ${FROM_ARG}
 ARG ROS_DISTRO
 ARG VERSION
 
+USER autoware
 ENV USERNAME autoware
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -20,4 +21,6 @@ RUN echo "source /home/$USERNAME/Autoware/install/local_setup.bash" >> \
     /home/$USERNAME/.bashrc
 
 COPY ./entrypoint.sh /tmp
+# hadolint ignore=DL3002
+USER root
 ENTRYPOINT ["/tmp/entrypoint.sh"]
