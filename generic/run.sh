@@ -136,9 +136,14 @@ if [ "$BASE_ONLY" == "true" ]; then
     VOLUMES="$VOLUMES --volume=$AUTOWARE_HOST_DIR:$AUTOWARE_DOCKER_DIR "
 fi
 
+DOCKER_VERSION=$(docker version --format '{{.Client.Version}}' | cut --delimiter=. --fields=1,2)
 if [ $CUDA == "on" ]; then
     SUFFIX=$SUFFIX"-cuda"
-    RUNTIME="--runtime=nvidia"
+    if [[ $DOCKER_VERSION < "19.03" ]] && ! type nvidia-docker; then
+        RUNTIME="--gpus all"
+    else
+        RUNTIME="--runtime=nvidia"
+    fi
 fi
 
 if [ $PRE_RELEASE == "on" ]; then
