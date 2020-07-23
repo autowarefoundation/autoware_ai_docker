@@ -139,7 +139,7 @@ fi
 DOCKER_VERSION=$(docker version --format '{{.Client.Version}}' | cut --delimiter=. --fields=1,2)
 if [ $CUDA == "on" ]; then
     SUFFIX=$SUFFIX"-cuda"
-    if [[ $DOCKER_VERSION < "19.03" ]] && ! type nvidia-docker; then
+    if [[ ! $DOCKER_VERSION < "19.03" ]] && ! type nvidia-docker; then
         RUNTIME="--gpus all"
     else
         RUNTIME="--runtime=nvidia"
