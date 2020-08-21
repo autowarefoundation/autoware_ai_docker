@@ -101,7 +101,7 @@ WORKDIR /tmp
 # hadolint ignore=DL3003
 RUN curl -sL -o eigen-3.3.7.tar.gz https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && \
     tar xf eigen-3.3.7.tar.gz && \
-    cd eigen-eigen-* && \
+    cd eigen-3.3.7 && \
     mkdir build && \
     cd build && \
     cmake .. && \
