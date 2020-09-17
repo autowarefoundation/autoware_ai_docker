@@ -118,11 +118,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libx11-dev && \
     rm -rf /var/lib/apt/lists/*
 COPY --from=glvnd_runtime \
-  /usr/lib/x86_64-linux-gnu \
-  /usr/lib/x86_64-linux-gnu
-COPY --from=glvnd_runtime \
   /usr/share/glvnd/egl_vendor.d/10_nvidia.json \
   /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+COPY --from=glvnd_runtime \
+  /usr/lib/x86_64-linux-gnu \
+  /usr/lib/x86_64-linux-gnu
 RUN echo '/usr/lib/x86_64-linux-gnu' >> /etc/ld.so.conf.d/glvnd.conf && \
     ldconfig
 # nvidia-container-runtime
