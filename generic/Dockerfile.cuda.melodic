@@ -132,4 +132,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 ENV AUTOWARE_COMPILE_WITH_CUDA ON
 
+# Install TVM inference library with CUDA integration
+COPY install_tvm.sh /tmp/install_tvm.sh
+RUN /tmp/install_tvm.sh
+
 ENTRYPOINT ["/tmp/entrypoint.sh"]
