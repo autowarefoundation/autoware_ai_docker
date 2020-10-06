@@ -48,7 +48,7 @@ echo "set(USE_LLVM llvm-config-8)" >> ${TVM_BUILD_CONFIG}
 echo "set(USE_SORT ON)" >> ${TVM_BUILD_CONFIG}
 echo "set(USE_GRAPH_RUNTIME ON)" >> ${TVM_BUILD_CONFIG}
 echo "set(USE_BLAS openblas)" >> ${TVM_BUILD_CONFIG}
-if [[ -f "/usr/local/cuda" ]]; then
+if [[ -d "/usr/local/cuda" ]]; then
     echo "set(USE_CUDA ON)" >> ${TVM_BUILD_CONFIG}
 fi
 
