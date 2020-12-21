@@ -48,12 +48,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         v4l-utils \
         vim \
         wget && \
-        pip3 install -U setuptools && \
+        pip3 install -U --no-cache-dir setuptools && \
         rm -rf /var/lib/apt/lists/*
-
-# Install TVM inference library
-COPY install_tvm.sh /tmp/install_tvm.sh
-RUN /tmp/install_tvm.sh
 
 #
 # Configure environmet

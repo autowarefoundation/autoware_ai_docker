@@ -58,7 +58,7 @@ COPY ./cross-dependencies /tmp/cross-dependencies
 RUN apt-get update && \
     sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/cross-dependencies" | xargs apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    pip3 install -U setuptools
+    pip3 install -U --no-cache-dir setuptools
 
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/melodic/include#${AUTOWARE_SYSROOT}/opt/ros/melodic/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/melodic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/melodic/lib#${AUTOWARE_SYSROOT}/opt/ros/melodic/lib#g" {} \;

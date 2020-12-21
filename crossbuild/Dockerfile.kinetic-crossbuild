@@ -48,7 +48,7 @@ COPY ./cross-dependencies /tmp/cross-dependencies
 RUN apt-get update && \
     sed "s/\$ROS_DISTRO/$ROS_DISTRO/g" "/tmp/cross-dependencies" | xargs apt-get install -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    pip3 install -U setuptools
+    pip3 install -U --no-cache-dir setuptools
 
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/kinetic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/kinetic/include#${AUTOWARE_SYSROOT}/opt/ros/kinetic/include#g" {} \;
 RUN find ${AUTOWARE_SYSROOT}/opt/ros/kinetic/share/ -name "*.cmake" -type f -exec sed -i -e "s#/opt/ros/kinetic/lib#${AUTOWARE_SYSROOT}/opt/ros/kinetic/lib#g" {} \;

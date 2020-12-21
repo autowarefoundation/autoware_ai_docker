@@ -105,6 +105,7 @@ ros-$ROS_DISTRO-tf2
 ros-$ROS_DISTRO-tf2-geometry-msgs
 ros-$ROS_DISTRO-tf2-ros
 ros-$ROS_DISTRO-transmission-interface
+ros-$ROS_DISTRO-tvm-vendor
 ros-$ROS_DISTRO-uvc-camera
 ros-$ROS_DISTRO-vector-map-msgs
 ros-$ROS_DISTRO-velocity-controllers
