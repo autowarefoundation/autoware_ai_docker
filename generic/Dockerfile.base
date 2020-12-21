@@ -51,10 +51,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pip3 install -U setuptools && \
         rm -rf /var/lib/apt/lists/*
 
-# Install TVM inference library
-COPY install_tvm.sh /tmp/install_tvm.sh
-RUN /tmp/install_tvm.sh
-
 #
 # Configure environmet
 #
