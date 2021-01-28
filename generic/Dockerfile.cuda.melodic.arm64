@@ -1,0 +1,155 @@
+ARG FROM_ARG
+FROM nvidia/opengl:1.0-glvnd-runtime-ubuntu18.04 as glvnd_runtime
+# hadolint ignore=DL3006
+FROM ${FROM_ARG}
+
+# hadolint ignore=DL3002
+USER root
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# From nvidia cuda 11.1.1 base: https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.1.1/ubuntu18.04-arm64/base/Dockerfile
+# hadolint ignore=DL3008
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/sbsa/7fa2af80.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/sbsa /" > /etc/apt/sources.list.d/cuda.list && \
+    echo "deb https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/sbsa /" > /etc/apt/sources.list.d/nvidia-ml.list && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV CUDA_VERSION 11.1.1
+
+# For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-cudart-11-1=11.1.74-1 \
+    && ln -s cuda-11.1 /usr/local/cuda && \
+    rm -rf /var/lib/apt/lists/*
+
+# Required for nvidia-docker v1
+RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf && \
+    echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf
+
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+ENV NVIDIA_REQUIRE_CUDA "cuda>=11.1"
+
+
+# From nvidia cuda 11.1.1 runtime: https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.1.1/ubuntu18.04-arm64/runtime/Dockerfile
+
+ENV NCCL_VERSION 2.8.3
+
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-libraries-11-1=11.1.1-1 \
+    cuda-nvtx-11-1=11.1.74-1 \
+    libnccl2=$NCCL_VERSION-1+cuda11.1 \
+    && apt-mark hold libnccl2 \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# From nvidia cuda 11.1.1 devel: https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.1.1/ubuntu18.04-arm64/devel/Dockerfile
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-nvml-dev-11-1=11.1.74-1 \
+    cuda-command-line-tools-11-1=11.1.1-1 \
+    cuda-libraries-dev-11-1=11.1.1-1 \
+    cuda-minimal-build-11-1=11.1.1-1 \
+    libnccl-dev=$NCCL_VERSION-1+cuda11.1 \
+    && apt-mark hold libnccl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
+
+
+#cuDNN and Tensorrt Install
+
+ENV CUDNN_VERSION 8.0.5.39-1+cuda11.1
+ENV TENSORRT_VERSION 7.2.1-1+cuda11.1
+RUN apt-get update && \
+apt-get install -y --no-install-recommends \
+        libcudnn8=${CUDNN_VERSION} \
+        libcudnn8-dev=${CUDNN_VERSION} \
+        libnvinfer7=${TENSORRT_VERSION} \
+        libnvonnxparsers7=${TENSORRT_VERSION} \
+        libnvparsers7=${TENSORRT_VERSION} \
+        libnvinfer-plugin7=${TENSORRT_VERSION} \
+        libnvinfer-dev=${TENSORRT_VERSION} \
+        libnvonnxparsers-dev=${TENSORRT_VERSION} \
+        libnvparsers-dev=${TENSORRT_VERSION} \
+        libnvinfer-plugin-dev=${TENSORRT_VERSION} \
+        python-libnvinfer=${TENSORRT_VERSION} \
+        python3-libnvinfer=${TENSORRT_VERSION} && \
+apt-mark hold \
+        libcudnn8 \
+        libcudnn8-dev \
+        libnvinfer7 \
+        libnvonnxparsers7 \
+        libnvparsers7 \
+        libnvinfer-plugin7 \
+        libnvinfer-dev \
+        libnvonnxparsers-dev \
+        libnvparsers-dev \
+        libnvinfer-plugin-dev \
+        python-libnvinfer \
+        python3-libnvinfer && \
+rm -rf /var/lib/apt/lists/*
+
+
+# Fix bug with CUDA and Eigen <= 3.3.7
+
+WORKDIR /tmp
+# hadolint ignore=DL3003
+RUN curl -sL -o eigen-3.3.7.tar.gz https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz && \
+    tar xf eigen-3.3.7.tar.gz && \
+    cd eigen-3.3.7 && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make install
+
+# Support for Nvidia docker v2
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        pkg-config \
+        libxau-dev \
+        libxdmcp-dev \
+        libxcb1-dev \
+        libxext-dev \
+        libx11-dev && \
+    rm -rf /var/lib/apt/lists/*
+COPY --from=glvnd_runtime \
+  /usr/share/glvnd/egl_vendor.d/10_nvidia.json \
+  /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libxau6 \
+        libxdmcp6 \
+        libxcb1 \
+        libxext6 \
+        libx11-6 && \
+    rm -rf /var/lib/apt/lists/*
+ENV LD_LIBRARY_PATH /usr/lib/aarch64-linux-gnu${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libglvnd0 \
+        libgl1 \
+        libglx0 \
+        libegl1 \
+        libgles2 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN echo '/usr/lib/aarch64-linux-gnu' >> /etc/ld.so.conf.d/glvnd.conf && \
+    ldconfig
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ENV AUTOWARE_COMPILE_WITH_CUDA ON
+
+ENTRYPOINT ["/tmp/entrypoint.sh"]

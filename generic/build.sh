@@ -118,12 +118,20 @@ rm dependencies
 CUDA_SUFFIX=""
 if [ $CUDA == "on" ]; then
     CUDA_SUFFIX="-cuda"
+    ARM64_SUFFIX=""
+    if [[ $(uname -a) == *"aarch64"* ]]; then
+      if [ "$ROS_DISTRO" != "melodic" ]; then
+        echo "CUDA on arm64 only exists for melodic"
+        exit 1
+      fi
+      ARM64_SUFFIX=".arm64"
+    fi
     docker build \
         --rm \
         --network=host \
         --tag $BASE$CUDA_SUFFIX \
         --build-arg FROM_ARG=$BASE \
-        --file Dockerfile.cuda.$ROS_DISTRO .
+        --file Dockerfile.cuda.$ROS_DISTRO$ARM64_SUFFIX .
 fi
 
 if [ "$BASE_ONLY" == "true" ]; then
