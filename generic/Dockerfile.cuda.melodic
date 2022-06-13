@@ -11,20 +11,23 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # From nvidia cuda 10.0 base: https://gitlab.com/nvidia/cuda/tree/ubuntu18.04/10.0/base/Dockerfile
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends gnupg2 curl ca-certificates && \
-    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub | apt-key add - && \
-    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+    curl -fsOSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb && \
+    curl -fsOSL https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub && \
+    dpkg -i cuda-keyring_1.0-1_all.deb && \
+    apt-key add 7fa2af80.pub && \
     echo "deb https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    rm cuda-keyring_1.0-1_all.deb 7fa2af80.pub
 
 ENV CUDA_VERSION 10.0.130
 
-ENV CUDA_PKG_VERSION 10-0=$CUDA_VERSION-1
+ENV CUDA_PKG_VERSION 10-0
 
 # For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
         cuda-cudart-$CUDA_PKG_VERSION \
-        cuda-compat-10-0 && \
+        cuda-compat-$CUDA_PKG_VERSION && \
     ln -s cuda-10.0 /usr/local/cuda && \
     rm -rf /var/lib/apt/lists/*
 
