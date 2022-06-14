@@ -18,16 +18,16 @@ jobs:
 
       - name: Linting
         run: |
-          hadolint generic/Dockerfile
-          hadolint generic/Dockerfile.legacy.catkin
-          hadolint generic/Dockerfile.legacy.colcon
-          hadolint generic/Dockerfile.base
-          hadolint generic/Dockerfile.cuda.kinetic
-          hadolint generic/Dockerfile.cuda.melodic
-          hadolint crossbuild/Dockerfile.kinetic-crossbuild
-          hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks
-          hadolint crossbuild/Dockerfile.melodic-crossbuild
-          hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks
+          hadolint generic/Dockerfile --ignore DL3059
+          hadolint generic/Dockerfile.legacy.catkin --ignore DL3059
+          hadolint generic/Dockerfile.legacy.colcon --ignore DL3059
+          hadolint generic/Dockerfile.base --ignore DL3059
+          hadolint generic/Dockerfile.cuda.kinetic --ignore DL3059
+          hadolint generic/Dockerfile.cuda.melodic --ignore DL3059
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild --ignore DL3059
+          hadolint crossbuild/Dockerfile.kinetic-crossbuild-driveworks --ignore DL3059
+          hadolint crossbuild/Dockerfile.melodic-crossbuild --ignore DL3059
+          hadolint crossbuild/Dockerfile.melodic-crossbuild-driveworks --ignore DL3059
 
   pr-melodic:
     needs: dockerfile-lint
